@@ -90,6 +90,7 @@ h1 {
 }
 
 .tap-text {
+    display: block;
     font-size: 13px;
     color: #bc6485;
     margin-top: 8px;
@@ -235,13 +236,19 @@ h1 {
         </p>
 
         <button class="gift-button" id="openGift"
-                type="button" aria-expanded="false"
+                type="button"
+                aria-expanded="false"
                 aria-controls="surprises">
             <span class="gift" id="giftEmoji">🎁</span>
             <span class="tap-text" id="tapText">
                 Tap your gift to open it 💗
             </span>
         </button>
+
+        <!-- BOOMPALA music -->
+        <audio id="boompalaMusic"
+               src="./Download%20%2816%29.mp3"
+               preload="auto"></audio>
 
         <section id="surprises" aria-live="polite">
             <div class="opening-title">Surprise, Jasmine! 💗</div>
@@ -297,6 +304,7 @@ const giftEmoji = document.getElementById('giftEmoji');
 const tapText = document.getElementById('tapText');
 const surprises = document.getElementById('surprises');
 const intro = document.getElementById('intro');
+const boompalaMusic = document.getElementById('boompalaMusic');
 
 let opened = false;
 
@@ -305,6 +313,7 @@ openGift.addEventListener('click', function () {
 
     opened = true;
 
+    // Open the gift
     giftEmoji.textContent = '💝';
     giftEmoji.style.animation = 'none';
     tapText.textContent = 'Your surprises are waiting below! 💗';
@@ -313,6 +322,17 @@ openGift.addEventListener('click', function () {
     surprises.classList.add('show');
     openGift.setAttribute('aria-expanded', 'true');
 
+    // Start BOOMPALA from the beginning
+    boompalaMusic.currentTime = 0;
+
+    boompalaMusic.play().then(function () {
+        tapText.textContent = 'Enjoy your surprises with BOOMPALA! 🎶💗';
+    }).catch(function () {
+        tapText.textContent =
+            'Your gift is open! If music did not start, check the song file. 🎶';
+    });
+
+    // Scroll to the surprises
     setTimeout(function () {
         surprises.scrollIntoView({
             behavior: 'smooth',
@@ -320,6 +340,7 @@ openGift.addEventListener('click', function () {
         });
     }, 150);
 
+    // Release floating hearts
     for (let i = 0; i < 18; i++) {
         setTimeout(createHeart, i * 100);
     }
