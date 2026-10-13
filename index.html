@@ -246,9 +246,9 @@ h1 {
         </button>
 
         <!-- BOOMPALA music -->
-        <audio id="boompalaMusic"
-               src="./Download%20%2816%29.mp3"
-               preload="auto"></audio>
+        <audio id="boompalaMusic" preload="auto" playsinline>
+            <source src="./Download%20%2816%29.mp3" type="audio/mpeg">
+        </audio>
 
         <section id="surprises" aria-live="polite">
             <div class="opening-title">Surprise, Jasmine! 💗</div>
@@ -308,7 +308,7 @@ const boompalaMusic = document.getElementById('boompalaMusic');
 
 let opened = false;
 
-openGift.addEventListener('click', function () {
+openGift.addEventListener('click', async function () {
     if (opened) return;
 
     opened = true;
@@ -316,21 +316,27 @@ openGift.addEventListener('click', function () {
     // Open the gift
     giftEmoji.textContent = '💝';
     giftEmoji.style.animation = 'none';
-    tapText.textContent = 'Your surprises are waiting below! 💗';
+    tapText.textContent = 'Opening your surprises... 💗';
     intro.textContent = 'A little love, wrapped up just for you. 🥹❤️';
 
     surprises.classList.add('show');
     openGift.setAttribute('aria-expanded', 'true');
 
-    // Start BOOMPALA from the beginning
-    boompalaMusic.currentTime = 0;
+    // Start the music from the gift tap
+    try {
+        boompalaMusic.currentTime = 0;
+        await boompalaMusic.play();
 
-    boompalaMusic.play().then(function () {
         tapText.textContent = 'Enjoy your surprises with BOOMPALA! 🎶💗';
-    }).catch(function () {
+    } catch (error) {
+        console.error('BOOMPALA playback failed:', error);
+
         tapText.textContent =
-            'Your gift is open! If music did not start, check the song file. 🎶';
-    });
+            'Your gift is open! 🎁 The music could not start.';
+
+        // Allow another tap to retry playback
+        openGift.addEventListener('click', retryMusic, { once: true });
+    }
 
     // Scroll to the surprises
     setTimeout(function () {
@@ -344,6 +350,22 @@ openGift.addEventListener('click', function () {
     for (let i = 0; i < 18; i++) {
         setTimeout(createHeart, i * 100);
     }
+});
+
+async function retryMusic() {
+    try {
+        await boompalaMusic.play();
+        tapText.textContent = 'Enjoy your surprises with BOOMPALA! 🎶💗';
+    } catch (error) {
+        tapText.textContent =
+            'Music still unavailable. Please check the song file. 🎵';
+
+        console.error('Music retry failed:', error);
+    }
+}
+
+boompalaMusic.addEventListener('error', function () {
+    console.error('Audio file could not load.', boompalaMusic.error);
 });
 
 function createHeart() {
